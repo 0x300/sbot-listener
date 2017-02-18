@@ -1,0 +1,17 @@
+{
+  "name": "sbot-listener",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "autoit": "^1.1.9",
+    "firebase-admin": "^4.1.1",
+    "node-gyp": "^3.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
