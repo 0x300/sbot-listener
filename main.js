@@ -38,17 +38,17 @@ const globalChatCtrl = [botHwnd, getCtrlHandleById(784)]
 // Poll the bot log for changes and upload text to firebase
 let prevLogText = autoit.ControlGetText(...logCtrl, 200000000)
 setInterval(() => {
-  // console.log('=> Polling bot log..');
   const newLogText = autoit.ControlGetText(...logCtrl, 200000000).replace(prevLogText, '')
-
   if (!newLogText) return;
-  // console.log('=> Sending to Firebase: \n' + newLogText +'\n');
+
+  // Push the new log text to firebase
   logRef.push().set(newLogText.split('\r\n').slice(0,-1))
   prevLogText += newLogText;
 }, 1000)
 
 // Poll bot for bot status
 setInterval(() => {
+  // Get values from each of the bot ui controls
   const botState = {
     gold: autoit.ControlGetText(...charGoldCtrl),
     botUptime: autoit.ControlGetText(...botUptimeCtrl),
@@ -56,6 +56,8 @@ setInterval(() => {
     charStatus: autoit.ControlGetText(...charStatusCtrl),
     charDeathsSession: autoit.ControlGetText(...charDeathsSessionCtrl)
   }
+
+  // Send updated bot state object to firebase
   charStatusRef.set(botState)
 }, 1000)
 
@@ -63,9 +65,9 @@ setInterval(() => {
 let prevGlobalChat = autoit.ControlGetText(...globalChatCtrl, 200000000)
 setInterval(() => {
   const newChatText = autoit.ControlGetText(...globalChatCtrl, 200000000).replace(prevGlobalChat, '')
-
   if (!newChatText) return;
-  // console.log('=> Sending to Firebase: \n' + newChatText +'\n');
+
+  // Split the chat up on newline and construct a message object for each msg
   newChatText.split('\r\n').slice(0,-1).forEach((message) => {
     globalChatRef.push(constructMsgObj(message))
   })
@@ -73,6 +75,8 @@ setInterval(() => {
   prevGlobalChat += newChatText;
 }, 1000)
 
+// Constructs an object for a chat message that has parsed out information
+// about the sender and whether there are things they want to sell, buy, or trade
 function constructMsgObj(msg) {
   // make sure message isn't empty or undefined
   if(!(msg !== '' && msg)) return;
@@ -96,7 +100,6 @@ function constructMsgObj(msg) {
   if(!matchArr) return obj; // no offers found.. just return the message object
 
   // push each offer into the appropriate array
-  // console.dir(matchArr);
   matchArr.forEach((match) => {
     obj.offers[match.substring(0,3)].push(match);
   });
